@@ -29,15 +29,18 @@ class _FirstScreenState extends State<FirstScreen> {
   bool isAboutYouFull = false;
 
   void checkButton() {
-    if (isSurnameFull &&
-        isNameFull &&
-        isFatherNameFull &&
-        isBirthdayFull &&
-        isAboutYouFull) {
-      isButtonActive = true;
-    } else {
-      isButtonActive = false;
-    }
+    setState(() {
+      if (isSurnameFull &&
+          isNameFull &&
+          isFatherNameFull &&
+          isBirthdayFull &&
+          isAboutYouFull) {
+        isButtonActive = true;
+      } else {
+        isButtonActive = false;
+      }
+
+    });
   }
 
   @override
@@ -46,7 +49,7 @@ class _FirstScreenState extends State<FirstScreen> {
       appBar: AppBar(
         centerTitle: true,
         title: const Text(
-          'First Screen',
+          'First Screen. Enter your details',
           style: TextStyle(fontStyle: FontStyle.italic),
         ),
         backgroundColor: Colors.blue[800],
@@ -58,22 +61,37 @@ class _FirstScreenState extends State<FirstScreen> {
             TextFieldFio(
               controller: surnameController,
               text: 'Surname',
-              isFull: isSurnameFull,
+              onChangedCallback: (String value) {
+                isSurnameFull = value.isNotEmpty;
+                checkButton();
+              },
             ),
             TextFieldFio(
               controller: nameController,
               text: 'Name',
-              isFull: isNameFull,
+              onChangedCallback: (String value) {
+                isNameFull = value.isNotEmpty;
+
+                checkButton();
+              },
             ),
             TextFieldFio(
               controller: fatherNameController,
               text: 'FatherName',
-              isFull: isFatherNameFull,
+              onChangedCallback: (String value) {
+                isFatherNameFull = value.isNotEmpty;
+                setState(() {
+                  checkButton();
+                });
+              },
             ),
             TextFieldBirthday(
               controller: birthdayController,
               text: 'Birthday',
-              isFull: isBirthdayFull,
+              isFull: () {
+                isBirthdayFull = true;
+                checkButton();
+              },
             ),
             Padding(
               padding: const EdgeInsets.all(18.0),
@@ -89,21 +107,22 @@ class _FirstScreenState extends State<FirstScreen> {
                 maxLength: 300,
                 controller: aboutYouController,
                 onChanged: (value) {
-                  setState(() {
-                    //aboutYouController.text = value;
-                    isAboutYouFull = true;
-                  });
+                  checkButton();
+                  isAboutYouFull = true;
+                //   setState(() {
+                //     //aboutYouController.text = value;
+                //
+                //     isAboutYouFull = true;
+                //   });
                 },
-                onSubmitted: (String value) {
-                  debugPrint(value);
-                },
+                // onSubmitted: (String value) {
+                //   debugPrint(value);
+                // },
               ),
             ),
             ElevatedButton(
-              onPressed:
-
-                  //isButtonActive ?
-                  () async {
+              onPressed: isButtonActive
+                  ? () async {
                 surname = surnameController.text;
                 surnameController.clear();
                 name = nameController.text;
@@ -115,12 +134,24 @@ class _FirstScreenState extends State<FirstScreen> {
                 aboutYou = aboutYouController.text;
                 aboutYouController.clear();
 
-                Map<String,dynamic> result = await sendData();
+                Map<String, dynamic> result = await sendData();
+                // variant if we have 2 conditions true or false
+                // setState(() {
+                //   result['result']
+                //       ? showAlertTrue(context)
+                //       : showAlertFalse(context);
+                // });
+
+                // variant if we have 3 conditions true, false, null
+
                 setState(() {
-                  result['result']? showAlertTrue (context): showAlertFalse(context);
+                  if (result['result']!=null ) {
+                    result['result']? showAlertTrue(context): showAlertFalse(context);
+                  }
+
                 });
-              },
-              //: null,
+              }
+                  : null,
               child: const Text('Send data'),
             ),
           ],
@@ -129,57 +160,90 @@ class _FirstScreenState extends State<FirstScreen> {
     );
   }
 
-  Future<Map<String,dynamic>> sendData() async {
+  Future<Map<String, dynamic>> sendData() async {
     Map<String, dynamic> result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => SecondScreen(
-            surname: surname,
-            name: name,
-            fatherName: fatherName,
-            birthday: birthday,
-            aboutYou: aboutYou),
+        builder: (BuildContext context) =>
+            SecondScreen(
+                surname: surname,
+                name: name,
+                fatherName: fatherName,
+                birthday: birthday,
+                aboutYou: aboutYou),
       ),
     );
     return result;
   }
-}
 
-void  showAlertTrue (BuildContext context){
-  showDialog(context: context, builder: (BuildContext context){
-    return AlertDialog(
-      title: const Text('Results'),
-      content: const ListTile(
-        leading: Icon(Icons.check, color: Colors.green, size: 15,),
-        title: Text('All your details are correct'),
-      ),
-      actions: [
-        ElevatedButton(onPressed: (){
-          Navigator.of(context).pop();
-        }, child: const Text('OK'))
-      ],
-    );
+
+  void showAlertTrue(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Results'),
+            content: const ListTile(
+              leading: Icon(
+                Icons.check,
+                color: Colors.green,
+                size: 15,
+              ),
+              title: Text('All your details are correct'),
+            ),
+            actions: [
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'))
+            ],
+          );
+        });
   }
-  );}
 
+  Future<AlertDialog?> showAlertFalse(BuildContext context) async {
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Results'),
+            content: const ListTile(
+              leading: Icon(
+                Icons.close,
+                color: Colors.red,
+                size: 15,
+              ),
+              title: Text('Some of your details are not correct'),
+            ),
+            actions: [
+              ElevatedButton(
+                  onPressed: () {
+                    // surnameController.dispose();
+                    // nameController.dispose();
+                    // fatherNameController.dispose();
+                    // birthdayController.dispose();
+                    // aboutYouController.dispose();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'))
+            ],
+          );
+        });
+  }
 
-Future<AlertDialog?> showAlertFalse (BuildContext context) async{
-  await showDialog(context: context, builder: (BuildContext context)
-{
-  return AlertDialog(
-  title: const Text('Results'),
-content: const ListTile(
-leading: Icon(Icons.close, color: Colors.red, size: 15,),
-title: Text('Some of your details are not correct'),
-),
-actions: [
-ElevatedButton(onPressed: (){
-Navigator.of(context).pop();
-}, child: const Text('OK'))
-],
+ // Future<AlertDialog?> showAlertNull(BuildContext context) async {
+ //    await showDialog(context: context, builder: (BuildContext context) {
+ //      return AlertDialog(
+ //        title: Text('Details are not checked'),
+ //        actions: [
+ //          OutlinedButton(onPressed: (){
+ //            Navigator.of(context).pop();
+ //          }, child: Text('OK'),),
+ //        ],
+ //      );
+ //    },);
 
-  );
-}
-);
-}
+ }
+
 

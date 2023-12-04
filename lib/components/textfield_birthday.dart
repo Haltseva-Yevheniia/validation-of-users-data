@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class TextFieldBirthday extends StatefulWidget {
-  TextFieldBirthday({
+  final TextEditingController controller;
+  final String text;
+  //bool isFull;
+  final Function() isFull;
+
+  const TextFieldBirthday({
     super.key,
     required this.controller,
     required this.text,
     required this.isFull,
   });
 
-  final TextEditingController controller;
-  final String text;
-  bool isFull;
+
 
   @override
   State<TextFieldBirthday> createState() => _TextFieldBirthdayState();
@@ -31,8 +34,8 @@ class _TextFieldBirthdayState extends State<TextFieldBirthday> {
     if (pickedDate != null) {
 
      setState(() {
-       widget.controller.text = DateFormat('dd-MM-yyyy').format(pickedDate);
-       widget.isFull=true;
+       widget.controller.text = DateFormat('MM-dd-yyyy').format(pickedDate);
+       widget.isFull();
      });
     }
   }

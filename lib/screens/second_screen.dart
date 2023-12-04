@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:validation_of_users_data/components/build_row_radio_check.dart';
 import 'package:validation_of_users_data/components/enum_answers.dart';
 
 class SecondScreen extends StatefulWidget {
-  SecondScreen(
+  const SecondScreen(
       {super.key,
       required this.surname,
       required this.name,
@@ -11,11 +10,15 @@ class SecondScreen extends StatefulWidget {
       required this.birthday,
       required this.aboutYou});
 
-  String surname;
-  String name;
-  String fatherName;
-  String birthday;
-  String aboutYou;
+  final String surname;
+  final String name;
+  final String fatherName;
+  final String birthday;
+  final String aboutYou;
+
+  //DateTime birthdayDate = DateTime.parse(formattedString)
+
+
   @override
   State<SecondScreen> createState() => _SecondScreenState();
 }
@@ -26,7 +29,9 @@ class _SecondScreenState extends State<SecondScreen> {
   Answers selectedAnswerFatherName = Answers.wrong;
   Answers selectedAnswerBirthday= Answers.wrong;
   Answers selectedAnswerAboutYou = Answers.wrong;
-bool result = false;
+  bool result = false;
+
+
   void isDataCorrect (){
 
     if ( selectedAnswerSurname == Answers.right &&
@@ -58,7 +63,8 @@ bool result = false;
                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox( height: 30, child: Text('Surname is ${widget.surname}')),
-                  buildRowRadioCheck(selectedAnswerSurname),
+                  //RowOfRadio(selectedAnswer: selectedAnswerSurname),
+                  buildRowRadioCheck(0,selectedAnswerSurname),
                 ],
               ),
            ),
@@ -73,7 +79,8 @@ bool result = false;
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 SizedBox( height: 30, child: Text('Name is ${widget.name}')),
-                buildRowRadioCheck(selectedAnswerName),
+                //RowOfRadio(selectedAnswer: selectedAnswerName),
+                buildRowRadioCheck(1,selectedAnswerName),
               ],
             ),
           ),
@@ -86,7 +93,8 @@ bool result = false;
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 SizedBox( height: 30, child: Text('Fathername is ${widget.fatherName}')),
-                buildRowRadioCheck(selectedAnswerFatherName),
+                //RowOfRadio(selectedAnswer: selectedAnswerFatherName),
+                buildRowRadioCheck(2,selectedAnswerFatherName),
               ],
             ),
           ),
@@ -99,7 +107,10 @@ bool result = false;
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 SizedBox( height: 30, child: Text('Birthday is ${widget.birthday}')),
-                buildRowRadioCheck(selectedAnswerBirthday),
+                buildRowRadioCheck(3,selectedAnswerBirthday),
+                //RowOfRadio(selectedAnswer: selectedAnswerBirthday),
+
+                //buildRowRadioCheck(selectedAnswerBirthday),
               ],
             ),
           ),
@@ -111,8 +122,10 @@ bool result = false;
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                SizedBox( height: 30, child: Text('About yourself ${widget.aboutYou}')),
-                buildRowRadioCheck(selectedAnswerAboutYou),
+                SizedBox( height: 60, width: 200, child: Text('About yourself ${widget.aboutYou}')),
+                buildRowRadioCheck(4,selectedAnswerAboutYou),
+                //RowOfRadio(selectedAnswer: selectedAnswerAboutYou),
+
               ],
             ),
           ),
@@ -135,9 +148,16 @@ bool result = false;
         ],
       ),
     );
+
+
   }
 
-  Row buildRowRadioCheck(Answers selectedAnswer) {
+
+
+
+
+
+  Row buildRowRadioCheck(int type, Answers selectedAnswer) {
     return Row(
 
       children: [
@@ -149,7 +169,17 @@ bool result = false;
               groupValue: selectedAnswer,
               onChanged: (Answers? value) {
                 setState(() {
-                  selectedAnswer = value!;
+                  switch(type) {
+                    case 0: selectedAnswerSurname = value?? Answers.wrong;
+                    case 1: selectedAnswerName = value?? Answers.wrong;
+                    case 2: selectedAnswerFatherName = value?? Answers.wrong;
+                    case 3: selectedAnswerBirthday = value?? Answers.wrong;
+                    case 4: selectedAnswerAboutYou = value?? Answers.wrong;
+
+                      //selectedAnswerAboutYou = value ?? Answers.wrong;
+
+                  }
+                  //selectedAnswer = value!;
                 });
               },
             ),
@@ -163,7 +193,14 @@ bool result = false;
               groupValue: selectedAnswer,
               onChanged: (Answers? value) {
                 setState(() {
-                  selectedAnswer = value!;
+    switch(type) {
+    case 0: selectedAnswerSurname = value?? Answers.wrong;
+    case 1: selectedAnswerName = value?? Answers.wrong;
+    case 2: selectedAnswerFatherName = value?? Answers.wrong;
+    case 3: selectedAnswerBirthday = value?? Answers.wrong;
+    case 4: selectedAnswerAboutYou = value?? Answers.wrong;}
+
+                  //selectedAnswer = value!;
                 });
               },
             ),
@@ -173,3 +210,50 @@ bool result = false;
     );
   }
 }
+
+// class RowOfRadio extends StatefulWidget {
+//   RowOfRadio({super.key, required this.selectedAnswer});
+// Answers selectedAnswer;
+//
+//   @override
+//   State<RowOfRadio> createState() => _RowOfRadioState();
+// }
+//
+// class _RowOfRadioState extends State<RowOfRadio> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//
+//       children: [
+//         Column(
+//           children: [
+//             const Text('Right'),
+//             Radio(
+//               value: Answers.right,
+//               groupValue: widget.selectedAnswer,
+//               onChanged: (Answers? value) {
+//                 setState(() {
+//                   widget.selectedAnswer = value!;
+//                 });
+//               },
+//             ),
+//           ],
+//         ),
+//         Column(
+//           children: [
+//             const Text('Wrong'),
+//             Radio(
+//               value: Answers.wrong,
+//               groupValue: widget.selectedAnswer,
+//               onChanged: (Answers? value) {
+//                 setState(() {
+//                   widget.selectedAnswer = value!;
+//                 });
+//               },
+//             ),
+//           ],
+//         ),
+//       ],
+//     );
+//   }
+// }
